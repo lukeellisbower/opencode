@@ -3,6 +3,42 @@ import { generatePKCE } from "@openauthjs/openauth/pkce";
 
 const CLIENT_ID = "9d1c250a-e61b-44d9-88ed-5944d1962f5e";
 
+// Fallback PKCE implementation for environments without crypto.subtle
+function generateRandomString(length: number): string {
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+async function generatePKCEFallback() {
+  // Generate a random code verifier (43-128 characters)
+  const codeVerifier = generateRandomString(128);
+
+  // For the code challenge, we'll use the verifier directly (plain method)
+  // This is less secure but works without crypto.subtle
+  return {
+    verifier: codeVerifier,
+    challenge: codeVerifier,
+    method: "plain" as const,
+  };
+}
+
+async function safePKCEGenerate() {
+  try {
+    // Try the secure method first
+    return await generatePKCE();
+  } catch (error) {
+    console.warn(
+      "crypto.subtle not available, using fallback PKCE implementation",
+    );
+    return await generatePKCEFallback();
+  }
+}
+
 export type AnthropicAuthMode = "max" | "console";
 export type AnthropicAuthMethod = "claude-pro" | "api-key";
 
@@ -40,7 +76,7 @@ export class AnthropicAuth {
     method: AnthropicAuthMethod,
   ): Promise<AuthorizeResult> {
     const mode: AnthropicAuthMode = method === "claude-pro" ? "max" : "console";
-    const pkce = await generatePKCE();
+    const pkce = await safePKCEGenerate();
 
     const url = new URL(
       `https://${mode === "console" ? "console.anthropic.com" : "claude.ai"}/oauth/authorize`,
