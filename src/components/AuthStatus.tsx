@@ -10,136 +10,71 @@ const authService = new AuthService();
 interface Provider {
   id: string;
   name: string;
-  models: string[];
-  authenticated: boolean;
-  authType?: "api" | "oauth" | "wellknown";
+  description: string;
+  authType: "api" | "oauth";
 }
 
-interface ProvidersResponse {
-  providers: Provider[];
-  default: Record<string, string>;
-}
+// Static list of providers that can be authenticated
+const AVAILABLE_PROVIDERS: Provider[] = [
+  {
+    id: "anthropic",
+    name: "Anthropic Claude",
+    description: "Claude 3.5 Sonnet, Claude 3 Haiku, and other Claude models",
+    authType: "oauth",
+  },
+  {
+    id: "openai",
+    name: "OpenAI",
+    description: "GPT-4o, GPT-4, GPT-3.5, and other OpenAI models",
+    authType: "api",
+  },
+  {
+    id: "google",
+    name: "Google AI",
+    description: "Gemini Pro, Gemini Flash, and other Google models",
+    authType: "api",
+  },
+  {
+    id: "mistral",
+    name: "Mistral AI",
+    description: "Mistral Large, Mistral Medium, and other Mistral models",
+    authType: "api",
+  },
+];
 
 export function AuthStatus() {
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState<{
     show: boolean;
     provider: Provider | null;
   }>({ show: false, provider: null });
 
-  const fetchProviders = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      console.log("🔍 Fetching providers...");
-      const response = await fetch("/api/opencode/config/providers");
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: ProvidersResponse = await response.json();
-      console.log("🔍 Providers response:", data);
-
-      // Check if Anthropic is authenticated in the response
-      const anthropicProvider = data.providers?.find(
-        (p) => p.id === "anthropic",
-      );
-      if (anthropicProvider) {
-        console.log(
-          "🔍 Anthropic provider status:",
-          anthropicProvider.authenticated,
-        );
-      }
-
-      setProviders(data.providers || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error occurred");
-      console.error("Error fetching providers:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProviders();
-  }, []);
-
-  const getStatusColor = (authenticated: boolean) => {
-    return authenticated ? "text-green-600" : "text-red-600";
-  };
-
-  const getStatusText = (authenticated: boolean) => {
-    return authenticated ? "Authenticated" : "Not Authenticated";
-  };
+  // Use static providers list
+  const providers = AVAILABLE_PROVIDERS;
 
   const handleAuthClick = (provider: Provider) => {
     setShowAuthModal({ show: true, provider });
   };
 
   const handleAuthSuccess = () => {
-    console.log("🔄 Auth success - closing modal and refreshing providers");
+    console.log("🔄 Auth success - closing modal");
     setShowAuthModal({ show: false, provider: null });
-    // Add a small delay to ensure the auth is fully processed
-    setTimeout(() => {
-      console.log("🔄 Fetching providers after auth success");
-      fetchProviders();
-    }, 500);
   };
 
   const handleClearAuth = async (providerId: string) => {
     try {
       await authService.clearAuth(providerId);
-      fetchProviders(); // Refresh the provider status
+      console.log(`🔄 Cleared auth for ${providerId}`);
     } catch (err) {
       console.error("Failed to clear authentication:", err);
     }
   };
 
-  const authenticatedCount = providers.filter((p) => p.authenticated).length;
-  const totalCount = providers.length;
-
-  if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Claude Code Authentication Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
-            <span className="ml-2">Loading authentication status...</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Claude Code Authentication Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-red-600 mb-4">Error: {error}</div>
-          <Button onClick={fetchProviders} variant="outline">
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Claude Code Authentication Status</CardTitle>
+        <CardTitle>OpenCode Provider Authentication</CardTitle>
         <div className="text-sm text-gray-600">
-          {authenticatedCount} of {totalCount} providers authenticated
+          Configure authentication for AI providers
         </div>
       </CardHeader>
       <CardContent>
@@ -152,56 +87,34 @@ export function AuthStatus() {
               <div className="flex-1">
                 <div className="font-medium">{provider.name}</div>
                 <div className="text-sm text-gray-500">
-                  {provider.models.length} models available
+                  {provider.description}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                  Auth type:{" "}
+                  {provider.authType === "oauth"
+                    ? "OAuth (Recommended)"
+                    : "API Key"}
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <div className="text-right">
-                  <div
-                    className={`font-medium ${getStatusColor(provider.authenticated)}`}
-                  >
-                    {getStatusText(provider.authenticated)}
-                  </div>
-                  {provider.authType && (
-                    <div className="text-xs text-gray-500 capitalize">
-                      {provider.authType}
-                    </div>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  {!provider.authenticated ? (
-                    <Button
-                      onClick={() => handleAuthClick(provider)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Authenticate
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={() => handleClearAuth(provider.id)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      Clear
-                    </Button>
-                  )}
-                </div>
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => handleAuthClick(provider)}
+                  size="sm"
+                  variant="outline"
+                >
+                  Configure
+                </Button>
+                <Button
+                  onClick={() => handleClearAuth(provider.id)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-red-600 hover:text-red-700"
+                >
+                  Clear
+                </Button>
               </div>
             </div>
           ))}
-        </div>
-
-        {providers.length === 0 && (
-          <div className="text-center py-4 text-gray-500">
-            No providers found
-          </div>
-        )}
-
-        <div className="mt-4 pt-4 border-t">
-          <Button onClick={fetchProviders} variant="outline" className="w-full">
-            Refresh Status
-          </Button>
         </div>
 
         {/* Authentication Modal */}

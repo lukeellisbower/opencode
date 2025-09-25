@@ -1,11 +1,11 @@
-=== Debug Log Started 2025-09-25T19:47:02.033Z ===
-[2025-09-25T19:47:03.390Z] 🌊 SSE REQUEST: Setting up server-sent events proxy
-[2025-09-25T19:47:03.502Z] 🌊 SSE PROXY: Connected to OpenCode events stream
-[2025-09-25T19:47:08.217Z] 📡 PROXY REQUEST: GET /api/opencode/config/providers -> http://0.0.0.0:3001/config/providers
-[2025-09-25T19:47:08.217Z] 📡 SESSION CREATE: POST http://0.0.0.0:3001/session
-[2025-09-25T19:47:08.256Z] 📡 SESSION CREATE BODY: {"title":"AI Chat - 25/09/2025, 20:47:08"}
-[2025-09-25T19:47:08.286Z] 📡 SESSION CREATE RESPONSE: 200 OK
-[2025-09-25T19:47:08.286Z] 📡 SESSION CREATE RESPONSE BODY: {"id":"ses_67d95b489ffekrz2T4BkZXQLhl","version":"0.11.3","projectID":"7578b76925b06d4426c84b865fe58b56c1293714","directory":"/Users/luke/dev/vm-agent/opencode","title":"AI Chat - 25/09/2025, 20:47:08","time":{"created":1758829628278,"updated":1758829628278}}
-[2025-09-25T19:47:08.296Z] 📡 PROXY RESPONSE: 200 for /api/opencode/config/providers
-[2025-09-25T19:47:08.296Z] 🌊 SSE REQUEST: Setting up server-sent events proxy
-[2025-09-25T19:47:08.330Z] 🌊 SSE PROXY: Connected to OpenCode events stream
+=== Debug Log Started 2025-09-25T20:05:46.313Z ===
+[2025-09-25T20:05:49.304Z] 🌊 SSE REQUEST: Setting up server-sent events proxy
+[2025-09-25T20:05:49.416Z] 🌊 SSE PROXY: Connected to OpenCode events stream
+[2025-09-25T20:05:52.256Z] 📡 SESSION CREATE: POST http://0.0.0.0:3001/session
+[2025-09-25T20:05:52.256Z] 📡 SESSION CREATE BODY: {"title":"AI Chat - 25/09/2025, 21:05:52"}
+[2025-09-25T20:05:52.264Z] 📡 SESSION CREATE RESPONSE: 200 OK
+[2025-09-25T20:05:52.264Z] 📡 SESSION CREATE RESPONSE BODY: {"id":"ses_67d848dfaffeQl6TcoVrKFXN6t","version":"0.11.3","projectID":"7578b76925b06d4426c84b865fe58b56c1293714","directory":"/Users/luke/dev/vm-agent/opencode","title":"AI Chat - 25/09/2025, 21:05:52","time":{"created":1758830752262,"updated":1758830752262}}
+[2025-09-25T20:05:52.266Z] 🌊 SSE REQUEST: Setting up server-sent events proxy
+[2025-09-25T20:05:52.267Z] 🌊 SSE PROXY: Connected to OpenCode events stream
+[2025-09-25T20:06:25.314Z] 🌊 SSE REQUEST: Setting up server-sent events proxy
+[2025-09-25T20:06:25.319Z] 🌊 SSE PROXY: Connected to OpenCode events stream
