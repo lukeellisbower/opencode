@@ -23,6 +23,7 @@ writeFileSync(
 );
 
 const server = serve({
+  hostname: "0.0.0.0",
   port: 3000,
   idleTimeout: 30, // 30 seconds timeout for SSE connections
   routes: {
@@ -54,7 +55,7 @@ const server = serve({
     // Test OpenCode server connectivity
     "/api/test/opencode": async (req) => {
       try {
-        const response = await fetch("http://127.0.0.1:3001/config", {
+        const response = await fetch("http://0.0.0.0:3001/config", {
           method: "GET",
         });
         if (response.ok) {
@@ -209,7 +210,7 @@ const server = serve({
         log(`🔧 AUTH REQUEST BODY: ${body}`);
 
         try {
-          const response = await fetch(`http://127.0.0.1:3001/auth/${id}`, {
+          const response = await fetch(`http://0.0.0.0:3001/auth/${id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -261,7 +262,7 @@ const server = serve({
     "/api/opencode/session": {
       async GET(req) {
         const url = new URL(req.url);
-        const opencodeUrl = `http://127.0.0.1:3001/session${url.search}`;
+        const opencodeUrl = `http://0.0.0.0:3001/session${url.search}`;
 
         log(`📡 SESSION LIST: ${req.method} ${opencodeUrl}`);
 
@@ -300,7 +301,7 @@ const server = serve({
         }
       },
       async POST(req) {
-        const opencodeUrl = `http://127.0.0.1:3001/session`;
+        const opencodeUrl = `http://0.0.0.0:3001/session`;
 
         log(`📡 SESSION CREATE: POST ${opencodeUrl}`);
 
@@ -362,10 +363,10 @@ const server = serve({
       async GET(req) {
         const { id } = req.params;
         const url = new URL(req.url);
-        const opencodeUrl = `http://127.0.0.1:3001/session/${id}/message${url.search}`;
-        
+        const opencodeUrl = `http://0.0.0.0:3001/session/${id}/message${url.search}`;
+
         log(`📡 MESSAGE LIST: GET ${opencodeUrl}`);
-        
+
         try {
           const response = await fetch(opencodeUrl, {
             method: "GET",
@@ -386,8 +387,12 @@ const server = serve({
           }
 
           const responseText = await response.text();
-          log(`📡 MESSAGE LIST RESPONSE: ${response.status} ${response.statusText}`);
-          log(`📡 MESSAGE LIST RESPONSE BODY: ${responseText.substring(0, 200)}...`);
+          log(
+            `📡 MESSAGE LIST RESPONSE: ${response.status} ${response.statusText}`,
+          );
+          log(
+            `📡 MESSAGE LIST RESPONSE BODY: ${responseText.substring(0, 200)}...`,
+          );
 
           return new Response(responseText, {
             status: response.status,
@@ -403,7 +408,7 @@ const server = serve({
       },
       async POST(req) {
         const { id } = req.params;
-        const opencodeUrl = `http://127.0.0.1:3001/session/${id}/message`;
+        const opencodeUrl = `http://0.0.0.0:3001/session/${id}/message`;
 
         log(`📡 MESSAGE SEND: POST ${opencodeUrl}`);
 
@@ -467,7 +472,7 @@ const server = serve({
       log(`🌊 SSE REQUEST: Setting up server-sent events proxy`);
 
       try {
-        const opencodeUrl = "http://127.0.0.1:3001/event";
+        const opencodeUrl = "http://0.0.0.0:3001/event";
 
         const response = await fetch(opencodeUrl, {
           method: "GET",
@@ -513,7 +518,7 @@ const server = serve({
     "/api/opencode/*": async (req) => {
       const url = new URL(req.url);
       const opencodeApiPath = url.pathname.replace("/api/opencode", "");
-      const opencodeUrl = `http://127.0.0.1:3001${opencodeApiPath}${url.search}`;
+      const opencodeUrl = `http://0.0.0.0:3001${opencodeApiPath}${url.search}`;
 
       // Log all OpenCode proxy requests
       log(`📡 PROXY REQUEST: ${req.method} ${url.pathname} -> ${opencodeUrl}`);

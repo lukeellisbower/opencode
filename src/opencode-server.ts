@@ -3,7 +3,7 @@ import { createOpencodeServer } from "@opencode-ai/sdk";
 export async function startOpencodeServer() {
   try {
     const server = await createOpencodeServer({
-      hostname: "127.0.0.1",
+      hostname: "0.0.0.0",
       port: 3001,
     });
 
