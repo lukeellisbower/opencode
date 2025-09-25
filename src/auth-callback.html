@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Authenticating...</title>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      const state = params.get('state');
+
+      if (window.opener) {
+        window.opener.postMessage({ type: 'anthropic-auth', code: code, state: state }, window.location.origin);
+        window.close();
+      } else {
+        document.body.innerText = 'Error: Could not find the main application window. Please close this tab and try again.';
+      }
+    });
+  </script>
+</head>
+<body>
+  <p>Please wait while we complete your authentication...</p>
+</body>
+</html>

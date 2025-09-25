@@ -52,7 +52,7 @@ export class AuthService {
   /**
    * Frontend: Complete authentication after user returns with code
    */
-  async completeAnthropicAuth(authCode: string): Promise<AuthResult> {
+  async completeAnthropicAuth(authCode: string, state: string): Promise<AuthResult> {
     try {
       const verifier = sessionStorage.getItem("anthropic_verifier");
       const method = sessionStorage.getItem(
@@ -69,6 +69,7 @@ export class AuthService {
 
       const success = await this.anthropicAuth.completeOAuthFlow(
         authCode,
+        state,
         verifier,
         method,
       );

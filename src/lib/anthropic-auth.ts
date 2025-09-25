@@ -87,7 +87,7 @@ export class AnthropicAuth {
     url.searchParams.set("response_type", "code");
     url.searchParams.set(
       "redirect_uri",
-      "https://console.anthropic.com/oauth/code/callback",
+      window.location.origin + "/auth/callback/anthropic",
     );
     url.searchParams.set(
       "scope",
@@ -108,11 +108,10 @@ export class AnthropicAuth {
    */
   async exchangeCode(
     code: string,
+    state: string,
     verifier: string,
     method: AnthropicAuthMethod,
   ): Promise<ExchangeResult> {
-    const splits = code.split("#");
-
     try {
       // Use backend proxy to avoid CORS issues
       const response = await fetch("/api/anthropic/oauth/token", {
@@ -121,11 +120,11 @@ export class AnthropicAuth {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          code: splits[0],
-          state: splits[1],
+          code: code,
+          state: state,
           grant_type: "authorization_code",
           client_id: CLIENT_ID,
-          redirect_uri: "https://console.anthropic.com/oauth/code/callback",
+          redirect_uri: window.location.origin + "/auth/callback/anthropic",
           code_verifier: verifier,
         }),
       });
@@ -234,10 +233,11 @@ export class AnthropicAuth {
    */
   async completeOAuthFlow(
     code: string,
+    state: string,
     verifier: string,
     method: AnthropicAuthMethod,
   ): Promise<boolean> {
-    const exchangeResult = await this.exchangeCode(code, verifier, method);
+    const exchangeResult = await this.exchangeCode(code, state, verifier, method);
     if (exchangeResult.type === "failed") {
       return false;
     }

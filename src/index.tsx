@@ -1,5 +1,6 @@
 import { serve } from "bun";
 import index from "./index.html";
+import authCallback from "./auth-callback.html";
 import { startOpencodeServer } from "./opencode-server";
 import { writeFileSync, appendFileSync } from "fs";
 
@@ -30,6 +31,8 @@ const server = serve({
     // Serve index.html for all unmatched routes.
     "/*": index,
 
+    "/auth/callback/anthropic": authCallback,
+
     "/api/hello": {
       async GET(req) {
         return Response.json({
@@ -51,6 +54,8 @@ const server = serve({
         message: `Hello, ${name}!`,
       });
     },
+
+    
 
     // Test OpenCode server connectivity
     "/api/test/opencode": async (req) => {

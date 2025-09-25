@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
+    
     "react": "^19",
     "react-dom": "^19",
     "react-hook-form": "^7.54.2",
